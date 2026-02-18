@@ -9,12 +9,12 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="manifest" href="manifest.json" />
   </head>
-  <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top border-bottom">
+  <body class="bg-body-tertiary">
+    <nav class="navbar navbar-expand-lg bg-body shadow-sm sticky-top border-bottom">
       <div class="container">
-        <span class="navbar-brand fw-bold">HR Helper PWA</span>
+        <span class="navbar-brand fw-bold text-primary"> <i class="bi bi-person-badge-fill me-2"></i>HR Cheat Sheet </span>
         <div class="d-flex align-items-center gap-2">
-          <select id="langSwitcher" class="form-select form-select-sm">
+          <select id="langSwitcher" class="form-select form-select-sm w-auto">
             <option value="uk">UA</option>
             <option value="en">EN</option>
           </select>
@@ -26,55 +26,110 @@
     </nav>
 
     <main class="container my-4">
-      <div class="row mb-4">
-        <div class="col-md-8">
-          <select id="jobSelect" class="form-select border-primary shadow-sm">
-            <option value="default">Загальна вакансія / General Job</option>
-          </select>
-        </div>
-        <div class="col-md-4 d-grid mt-2 mt-md-0">
-          <button id="addQuestionBtn" class="btn btn-primary"><i class="bi bi-plus-lg"></i> Додати питання</button>
+      <div class="card shadow-sm mb-4">
+        <div class="card-body p-3">
+          <div class="row g-3 align-items-center">
+            <div class="col-12 col-md-6 col-lg-7">
+              <div class="input-group">
+                <span class="input-group-text bg-primary text-white"><i class="bi bi-filter"></i></span>
+                <select id="jobSelect" class="form-select border-primary"></select>
+              </div>
+            </div>
+            <div class="col-12 col-md-6 col-lg-5 d-flex gap-2">
+              <button id="addQuestionBtn" class="btn btn-primary flex-grow-1 shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i>
+              </button>
+              <button id="btnManageJobs" class="btn btn-outline-secondary flex-grow-1 shadow-sm">
+                <i class="bi bi-tags me-1"></i>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div id="questionsList" class="accordion shadow-sm"></div>
+      <div id="questionsList" class="accordion shadow-sm rounded-3 overflow-hidden"></div>
 
-      <footer class="mt-5 pt-4 border-top text-center">
-        <button id="exportBtn" class="btn btn-sm btn-outline-success mx-1"><i class="bi bi-download"></i> Экспорт (JSON)</button>
-        <button id="importBtn" class="btn btn-sm btn-outline-warning mx-1"><i class="bi bi-upload"></i> Импорт</button>
+      <div class="mt-5 mb-4 py-4 border-top text-center">
+        <div class="d-inline-flex gap-2 p-2 bg-body rounded shadow-sm border">
+          <button id="exportBtn" class="btn btn-sm btn-outline-success border-0">
+            <i class="bi bi-download me-1"></i>
+          </button>
+          <div class="vr"></div>
+          <button id="importBtn" class="btn btn-sm btn-outline-warning border-0">
+            <i class="bi bi-upload me-1"></i>
+          </button>
+        </div>
         <input type="file" id="importFile" hidden accept=".json" />
-      </footer>
+      </div>
     </main>
 
-    <div class="modal fade" id="questionModal" tabindex="-1" aria-labelledby="modalTitle">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalTitle">Додати питання</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <footer class="bg-body border-top py-4 mt-auto">
+      <div class="container">
+        <div class="row align-items-center g-3 text-center text-md-start">
+          <div class="col-md-4">
+            <span class="fw-bold">HR Cheat Sheet</span>
+            <span class="badge bg-secondary-subtle text-secondary ms-1 app-version-display">v1.1.0</span>
+          </div>
+          <div class="col-md-4 text-center">
+            <small class="text-secondary">
+              &copy; 2026 <a href="https://worldofsites.net" target="_blank" class="text-decoration-none fw-medium">WorldOfSites.net</a>
+            </small>
+          </div>
+          <div class="col-md-4 text-md-end">
+            <a href="https://github.com/WorldOfSitesNet/hr-interview-pwa" target="_blank" class="btn btn-sm btn-light border">
+              <i class="bi bi-github me-1"></i>GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <div class="modal fade" id="questionModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow">
+          <div class="modal-header bg-primary text-white">
+            <h5 class="modal-title" id="modalTitle"></h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <form id="questionForm">
               <input type="hidden" id="editId" />
-              <div class="row g-3">
-                <div class="col-md-6 border-end">
-                  <h6>Українська версія</h6>
-                  <input type="text" id="q_uk" class="form-control mb-2" placeholder="Питання" required />
-                  <textarea id="a_uk" class="form-control mb-2" placeholder="Приклад відповіді" rows="3" required></textarea>
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label fw-bold border-bottom pb-1 w-100">Українська версія</label>
+                  <input type="text" id="q_uk" class="form-control mb-3" placeholder="Питання" required />
+                  <textarea id="a_uk" class="form-control mb-3" placeholder="Приклад відповіді" rows="4" required></textarea>
                   <textarea id="hint_uk" class="form-control" placeholder="Порада (що хоче HR)" rows="2"></textarea>
                 </div>
-                <div class="col-md-6">
-                  <h6>English Version</h6>
-                  <input type="text" id="q_en" class="form-control mb-2" placeholder="Question" required />
-                  <textarea id="a_en" class="form-control mb-2" placeholder="Sample Answer" rows="3" required></textarea>
+                <div class="col-md-6 border-start-md">
+                  <label class="form-label fw-bold border-bottom pb-1 w-100">English Version</label>
+                  <input type="text" id="q_en" class="form-control mb-3" placeholder="Question" required />
+                  <textarea id="a_en" class="form-control mb-3" placeholder="Sample Answer" rows="4" required></textarea>
                   <textarea id="hint_en" class="form-control" placeholder="Hint (What HR wants)" rows="2"></textarea>
                 </div>
               </div>
             </form>
           </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Скасувати</button>
-            <button type="submit" form="questionForm" class="btn btn-primary">Зберегти</button>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-link text-secondary text-decoration-none" id="btnCancel" data-bs-dismiss="modal"></button>
+            <button type="submit" form="questionForm" class="btn btn-primary px-4" id="btnSave"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="jobModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content shadow">
+          <div class="modal-header bg-secondary text-white">
+            <h5 class="modal-title" id="modalJobsTitle">Керування категоріями</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div id="jobsListContainer" class="mb-3"></div>
+            <button onclick="addCategory()" class="btn btn-sm btn-outline-primary w-100 py-2 border-dashed">
+              <i class="bi bi-plus-circle me-1"></i> <span id="btnAddCategory">Додати категорію</span>
+            </button>
           </div>
         </div>
       </div>

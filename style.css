@@ -1,0 +1,16 @@
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+main {
+  flex: 1;
+}
+.accordion-button:not(.collapsed) {
+  background-color: var(--bs-primary-border-subtle);
+  color: var(--bs-primary-text-emphasis);
+}
+.app-version-display {
+  font-size: 0.7rem;
+  vertical-align: middle;
+}
