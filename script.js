@@ -217,3 +217,68 @@ if ('serviceWorker' in navigator) {
         });
     });
 }
+
+// --- ЭКСПОРТ ---
+document.getElementById('exportBtn').addEventListener('click', () => {
+    const dataStr = JSON.stringify(appData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+    const exportFileDefaultName = `hr_cheat_sheet_${new Date().toISOString().slice(0, 10)}.json`;
+
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+});
+
+const importBtn = document.getElementById('importBtn');
+const importFile = document.getElementById('importFile');
+
+importBtn.addEventListener('click', () => importFile.click());
+
+importFile.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        try {
+            const importedData = JSON.parse(event.target.result);
+
+            if (validateImportedData(importedData)) {
+                if (confirm('Ви впевнені? Це замінить всі поточні питання новими даними.')) {
+                    appData = sanitizeData(importedData);
+                    saveAndRender();
+                    alert('Дані успішно імпортовано!');
+                }
+            } else {
+                alert('Помилка: Невірний формат файлу.');
+            }
+        } catch (err) {
+            alert('Помилка при читанні файлу: ' + err.message);
+        }
+        importFile.value = '';
+    };
+    reader.readAsText(file);
+});
+
+function validateImportedData(data) {
+    return data && Array.isArray(data.questions) && Array.isArray(data.jobs);
+}
+
+function sanitizeData(data) {
+    const tempDiv = document.createElement('div');
+    const cleanText = (str) => {
+        tempDiv.textContent = str;
+        return tempDiv.innerHTML;
+    };
+
+    data.questions = data.questions.map(q => ({
+        id: q.id || Date.now(),
+        jobId: q.jobId || 'default',
+        q: { uk: cleanText(q.q.uk), en: cleanText(q.q.en) },
+        a: { uk: cleanText(q.a.uk), en: cleanText(q.a.en) },
+        hint: { uk: cleanText(q.hint.uk), en: cleanText(q.hint.en) }
+    }));
+    return data;
+}
