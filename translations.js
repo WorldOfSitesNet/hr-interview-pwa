@@ -13,7 +13,9 @@ const translations = {
         btnSave: "Зберегти",
         btnCancel: "Скасувати",
         btnAddQuestion: "Додати питання",
-        jobLabel: "Вакансія:"
+        jobLabel: "Вакансія:",
+        btnExport: "Експорт",
+        btnImport: "Імпорт"
     },
     en: {
         modalTitleAdd: "Add Question",
@@ -29,6 +31,8 @@ const translations = {
         btnSave: "Save",
         btnCancel: "Cancel",
         btnAddQuestion: "Add Question",
-        jobLabel: "Job:"
+        jobLabel: "Job:",
+        btnExport: "Export",
+        btnImport: "Import"
     }
 };

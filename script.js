@@ -6,7 +6,7 @@ const initialData = {
         { id: 3, jobId: 'default', q: { uk: "Які ваші сильні сторони?", en: "What are your strengths?" }, a: { uk: "Я відповідальний та комунікабельний...", en: "I am responsible and communicative..." }, hint: { uk: "Підкріпіть прикладами", en: "Support with examples" } },
         { id: 4, jobId: 'default', q: { uk: "Які ваші слабкі сторони?", en: "What are your weaknesses?" }, a: { uk: "Іноді я надто перфекціоніст...", en: "Sometimes I am too much of a perfectionist..." }, hint: { uk: "Покажіть, що ви працюєте над ними", en: "Show that you are working on them" } },
         { id: 5, jobId: 'default', q: { uk: "Де ви бачите себе через 5 років?", en: "Where do you see yourself in 5 years?" }, a: { uk: "Я бачу себе в ролі...", en: "I see myself in the role of..." }, hint: { uk: "Покажіть амбіції та реалістичність", en: "Show ambition and realism" } },
-        { id: 6, jobId: 'default', q: { uk: "Чому ми повинні вибрати вас?", en: "Why should we choose you?" }, a: { uk: "Я маю унікальний досвід...", en: "I have unique experience..." }, hint: { uk: "Підкресліть свої переваги", en: "Highlight your advantages" } },
+        { id: 6, jobId: 'default', q: { uk: "Чому мы повинні вибрати вас?", en: "Why should we choose you?" }, a: { uk: "Я маю унікальний досвід...", en: "I have unique experience..." }, hint: { uk: "Підкресліть свої переваги", en: "Highlight your advantages" } },
         { id: 7, jobId: 'default', q: { uk: "Як ви справляєтесь зі стресом?", en: "How do you handle stress?" }, a: { uk: "Я використовую техніки релаксації...", en: "I use relaxation techniques..." }, hint: { uk: "Покажіть, що ви вмієте контролювати емоції", en: "Show that you can control your emotions" } },
         { id: 8, jobId: 'default', q: { uk: "Розкажіть про свій найбільший провал", en: "Tell about your biggest failure" }, a: { uk: "Мій найбільший провал був...", en: "My biggest failure was..." }, hint: { uk: "Покажіть, що ви вчитесь на помилках", en: "Show that you learn from mistakes" } },
         { id: 9, jobId: 'default', q: { uk: "Як ви працюєте в команді?", en: "How do you work in a team?" }, a: { uk: "Я вважаю, що командна робота важлива...", en: "I believe that teamwork is important..." }, hint: { uk: "Покажіть, що ви комунікабельний та відкритий", en: "Show that you are communicative and open" } },
@@ -22,7 +22,7 @@ const themeToggle = document.getElementById('themeToggle');
 const langSwitcher = document.getElementById('langSwitcher');
 const questionForm = document.getElementById('questionForm');
 
-// --- ЛОКАЛИЗАЦИЯ ---
+// --- LOCALIZATION ---
 function t(key) {
     const lang = langSwitcher ? langSwitcher.value : 'uk';
     if (typeof translations !== 'undefined' && translations[lang] && translations[lang][key]) {
@@ -32,30 +32,29 @@ function t(key) {
 }
 
 function updateStaticLabels() {
-    const lang = langSwitcher ? langSwitcher.value : 'uk';
-
-    // Кнопки модалки
     const saveBtn = document.getElementById('btnSave');
     const cancelBtn = document.getElementById('btnCancel');
     if (saveBtn) saveBtn.innerText = t('btnSave');
     if (cancelBtn) cancelBtn.innerText = t('btnCancel');
-
-    // Главная кнопка добавления (с сохранением иконки)
+    
     const addBtn = document.getElementById('addQuestionBtn');
     if (addBtn) {
         addBtn.innerHTML = `<i class="bi bi-plus-lg"></i> ${t('btnAddQuestion')}`;
     }
-
-    // Обновляем список вакансий в селекте
+    
+    const expBtn = document.getElementById('exportBtn');
+    const impBtn = document.getElementById('importBtn');
+    if (expBtn) expBtn.innerHTML = `<i class="bi bi-download"></i> ${t('btnExport')}`;
+    if (impBtn) impBtn.innerHTML = `<i class="bi bi-upload"></i> ${t('btnImport')}`;
+    
     renderJobSelect();
 }
 
-// Рендер выпадающего списка вакансий
 function renderJobSelect() {
     const jobSelect = document.getElementById('jobSelect');
     if (!jobSelect) return;
     const lang = langSwitcher.value;
-    const currentVal = jobSelect.value; // Сохраняем выбранное значение
+    const currentVal = jobSelect.value;
 
     jobSelect.innerHTML = appData.jobs.map(job =>
         `<option value="${job.id}">${job.name[lang] || job.name['uk']}</option>`
@@ -64,7 +63,7 @@ function renderJobSelect() {
     if (currentVal) jobSelect.value = currentVal;
 }
 
-// --- СЕРВИСНЫЕ ФУНКЦИИ ---
+// --- SERVICE FUNCTIONS ---
 function saveAndRender() {
     localStorage.setItem('hr_pwa_data', JSON.stringify(appData));
     renderQuestions();
@@ -96,7 +95,6 @@ function sanitizeData(data) {
 
 // --- DRAG AND DROP ---
 let draggedItemIndex = null;
-
 function addDragEvents(element) {
     element.addEventListener('dragstart', (e) => {
         draggedItemIndex = e.currentTarget.dataset.index;
@@ -122,7 +120,7 @@ function addDragEvents(element) {
     });
 }
 
-// --- РЕНДЕРИНГ ВОПРОСОВ ---
+// --- RENDERING ---
 function renderQuestions() {
     const list = document.getElementById('questionsList');
     if (!list) return;
@@ -160,12 +158,12 @@ function renderQuestions() {
     });
 }
 
-// --- ГЛОБАЛЬНЫЕ ФУНКЦИИ ---
+// --- GLOBAL FUNCTIONS ---
 window.editQuestion = function (id) {
     const q = appData.questions.find(item => item.id === id);
     if (!q) return;
     document.getElementById('editId').value = q.id;
-    document.getElementById('jobSelect').value = q.jobId; // Выбираем вакансию вопроса
+    document.getElementById('jobSelect').value = q.jobId;
     document.getElementById('q_uk').value = q.q.uk; document.getElementById('a_uk').value = q.a.uk; document.getElementById('hint_uk').value = q.hint.uk;
     document.getElementById('q_en').value = q.q.en; document.getElementById('a_en').value = q.a.en; document.getElementById('hint_en').value = q.hint.en;
     document.getElementById('modalTitle').innerText = t('modalTitleEdit');
@@ -180,13 +178,12 @@ window.deleteQuestion = function (id) {
     }
 };
 
-// --- ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ ---
+// --- INITIALIZATION ---
 window.onload = () => {
     const modalElement = document.getElementById('questionModal');
     if (modalElement) {
         modalElement.removeAttribute('aria-hidden');
         questionModal = new bootstrap.Modal(modalElement);
-
         modalElement.addEventListener('hide.bs.modal', () => {
             if (document.activeElement) document.activeElement.blur();
         });
@@ -199,7 +196,7 @@ window.onload = () => {
         langSwitcher.addEventListener('change', () => {
             localStorage.setItem('app_lang', langSwitcher.value);
             renderQuestions();
-            updateStaticLabels(); // Здесь обновится и селект, и кнопка "Add Question"
+            updateStaticLabels();
         });
     }
 
@@ -242,8 +239,7 @@ window.onload = () => {
             questionModal.show();
         });
     }
-
-    // Экспорт / Импорт остаются без изменений...
+    
     const expBtn = document.getElementById('exportBtn');
     if (expBtn) {
         expBtn.addEventListener('click', () => {
@@ -258,7 +254,7 @@ window.onload = () => {
             link.click();
         });
     }
-
+    
     const impBtn = document.getElementById('importBtn');
     const impFile = document.getElementById('importFile');
     if (impBtn && impFile) {
@@ -277,8 +273,10 @@ window.onload = () => {
                             if (imported.settings) {
                                 applyTheme(imported.settings.theme);
                                 langSwitcher.value = imported.settings.lang;
+                                localStorage.setItem('app_lang', imported.settings.lang);
                             }
                             saveAndRender();
+                            updateStaticLabels();
                             alert(t('importSuccess'));
                         }
                     } else { alert(t('importError')); }
@@ -289,7 +287,6 @@ window.onload = () => {
         });
     }
 
-    // Финальная настройка при загрузке
     const savedTheme = localStorage.getItem('theme') || 'light';
     const savedLang = localStorage.getItem('app_lang') || 'uk';
 
