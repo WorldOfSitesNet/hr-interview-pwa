@@ -1,4 +1,3 @@
-// Базовые данные (пример для начала)
 const initialData = {
     jobs: [{ id: 'default', name: { uk: 'Загальна', en: 'General' } }],
     questions: [
@@ -92,6 +91,43 @@ function updateThemeIcon(theme) {
     icon.className = theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
 }
 
+document.getElementById('langSwitcher').addEventListener('change', () => {
+    renderQuestions();
+});
+
+const modalElement = document.getElementById('questionModal');
+const questionModal = new bootstrap.Modal(modalElement);
+
+document.getElementById('addQuestionBtn').addEventListener('click', () => {
+    questionForm.reset();
+    document.getElementById('editId').value = '';
+    document.getElementById('modalTitle').innerText = 'Додати питання';
+    questionModal.show();
+});
+
+window.editQuestion = function (id) {
+    const q = appData.questions.find(item => item.id === id);
+    if (!q) return;
+
+    document.getElementById('editId').value = q.id;
+    document.getElementById('q_uk').value = q.q.uk;
+    document.getElementById('a_uk').value = q.a.uk;
+    document.getElementById('hint_uk').value = q.hint.uk;
+
+    document.getElementById('q_en').value = q.q.en;
+    document.getElementById('a_en').value = q.a.en;
+    document.getElementById('hint_en').value = q.hint.en;
+
+    document.getElementById('modalTitle').innerText = 'Редагувати питання / Edit Question';
+    questionModal.show();
+};
+
+document.getElementById('questionModal').addEventListener('hidden.bs.modal', () => {
+    questionForm.reset();
+    document.getElementById('editId').value = '';
+    document.getElementById('modalTitle').innerText = 'Додати питання';
+});
+
 window.onload = () => {
     const savedTheme = localStorage.getItem('theme') || 'light';
     html.setAttribute('data-bs-theme', savedTheme);
@@ -119,8 +155,52 @@ function renderQuestions() {
                         <div class="alert alert-info py-2">
                             <small><i class="bi bi-info-circle"></i> ${item.hint[lang]}</small>
                         </div>
+                        <button onclick="editQuestion(${item.id})" class="btn btn-sm btn-outline-primary">Редагувати</button>
+                        <button onclick="deleteQuestion(${item.id})" class="btn btn-sm btn-outline-danger">Видалити</button>
                     </div>
                 </div>
             </div>`;
     });
+}
+
+const questionForm = document.getElementById('questionForm');
+
+questionForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const id = document.getElementById('editId').value;
+    const newQuestion = {
+        id: id ? parseInt(id) : Date.now(),
+        jobId: document.getElementById('jobSelect').value,
+        q: { uk: document.getElementById('q_uk').value, en: document.getElementById('q_en').value },
+        a: { uk: document.getElementById('a_uk').value, en: document.getElementById('a_en').value },
+        hint: { uk: document.getElementById('hint_uk').value, en: document.getElementById('hint_en').value }
+    };
+
+    if (id) {
+        const index = appData.questions.findIndex(q => q.id == id);
+        appData.questions[index] = newQuestion;
+    } else {
+        appData.questions.push(newQuestion);
+    }
+
+    saveAndRender();
+    questionModal.hide();
+    questionForm.reset();
+});
+
+function saveAndRender() {
+    localStorage.setItem('hr_pwa_data', JSON.stringify(appData));
+    renderQuestions();
+}
+
+function deleteQuestion(id) {
+    if (confirm('Видалити це питання?')) {
+        appData.questions = appData.questions.filter(q => q.id !== id);
+        saveAndRender();
+    }
+}
+
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js');
 }
