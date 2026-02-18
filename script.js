@@ -1,5 +1,5 @@
 const APP_CONFIG = {
-    version: "1.1.0",
+    version: "1.1.1",
     siteUrl: "https://worldofsites.net",
     repoUrl: "https://github.com/WorldOfSitesNet/hr-interview-pwa"
 };
