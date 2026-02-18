@@ -1,0 +1,22 @@
+name: Create Release Zip
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create Zip Archive
+        run: zip -r hr-interview-pwa.zip . -x "*.git*" "*.github*"
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: hr-interview-pwa.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
