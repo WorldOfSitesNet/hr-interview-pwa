@@ -202,5 +202,18 @@ function deleteQuestion(id) {
 }
 
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./sw.js');
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        if (confirm('Доступна нова версія! Оновити сторінку?')) {
+                            window.location.reload();
+                        }
+                    }
+                });
+            });
+        });
+    });
 }
