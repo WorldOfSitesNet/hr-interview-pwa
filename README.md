@@ -41,7 +41,7 @@ This is an **Open Source** project and we welcome contributions!
 
 ## 📥 Installation
 
-1. Open the [App Link](https://worldofsites.net).
+1. Open the [App Link](https://worldofsites.net/apps/hr-interview-pwa).
 2. **On iOS**: Tap 'Share' in Safari → 'Add to Home Screen'.
 3. **On Android/Chrome**: Tap the three dots → 'Install App'.
 
