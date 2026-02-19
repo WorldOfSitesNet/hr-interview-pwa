@@ -8,7 +8,15 @@ const initialData = {
     jobs: [{ id: 'default', name: { uk: 'Загальна вакансія', en: 'General Job' } }],
     questions: [
         { id: 1, jobId: 'default', q: { uk: "Розкажіть про себе за 1 хвилину", en: "Tell about yourself in 1 minute" }, a: { uk: "Коротка історія досвіду...", en: "Brief history of your experience..." }, hint: { uk: "HR хоче почути про досягнення", en: "HR wants to hear about achievements" } },
-        { id: 2, jobId: 'default', q: { uk: "Чому ви хочете працювати у нас?", en: "Why do you want to work with us?" }, a: { uk: "Мені подобається ваша компанія...", en: "I like your company..." }, hint: { uk: "Покажіть, что ви вивчили про компанію", en: "Show that you have researched the company" } }
+        { id: 2, jobId: 'default', q: { uk: "Чому ви хочете працювати у нас?", en: "Why do you want to work with us?" }, a: { uk: "Мені подобається ваша компанія...", en: "I like your company..." }, hint: { uk: "Покажіть, що вы вивчили про компанію", en: "Show that you have researched the company" } },
+        { id: 3, jobId: 'default', q: { uk: "Які ваші сильні сторони?", en: "What are your strengths?" }, a: { uk: "Я відповідальний та комунікабельний...", en: "I am responsible and communicative..." }, hint: { uk: "Підкріпіть прикладами", en: "Support with examples" } },
+        { id: 4, jobId: 'default', q: { uk: "Які ваші слабкі сторони?", en: "What are your weaknesses?" }, a: { uk: "Іноді я надто перфекціоніст...", en: "Sometimes I am too much of a perfectionist..." }, hint: { uk: "Покажіть, що ви працюєте над ними", en: "Show that you are working on them" } },
+        { id: 5, jobId: 'default', q: { uk: "Де ви бачите себе через 5 років?", en: "Where do you see yourself in 5 years?" }, a: { uk: "Я бачу себе в ролі...", en: "I see myself in the role of..." }, hint: { uk: "Покажіть амбіції та реалістичність", en: "Show ambition and realism" } },
+        { id: 6, jobId: 'default', q: { uk: "Чому ми повинні вибрати вас?", en: "Why should we choose you?" }, a: { uk: "Я маю унікальний досвід...", en: "I have unique experience..." }, hint: { uk: "Підкресліть свої переваги", en: "Highlight your advantages" } },
+        { id: 7, jobId: 'default', q: { uk: "Як ви справляєтесь зі стресом?", en: "How do you handle stress?" }, a: { uk: "Я використовую техніки релаксації...", en: "I use relaxation techniques..." }, hint: { uk: "Покажіть, що ви вмієте контролювати емоції", en: "Show that you can control your emotions" } },
+        { id: 8, jobId: 'default', q: { uk: "Розкажіть про свій найбільший провал", en: "Tell about your biggest failure" }, a: { uk: "Мій найбільший провал був...", en: "My biggest failure was..." }, hint: { uk: "Покажіть, що ви вчитесь на помилках", en: "Show that you learn from mistakes" } },
+        { id: 9, jobId: 'default', q: { uk: "Як ви працюєте в команді?", en: "How do you work in a team?" }, a: { uk: "Я вважаю, що командна робота важлива...", en: "I believe that teamwork is important..." }, hint: { uk: "Покажіть, що ви комунікабельний та відкритий", en: "Show that you are communicative and open" } },
+        { id: 10, jobId: 'default', q: { uk: "Чи є у вас питання до нас?", en: "Do you have any questions for us?" }, a: { uk: "Так, я хотів би дізнатись більше про...", en: "Yes, I would like to know more about..." }, hint: { uk: "Задайте розумне питання про компанію або посаду", en: "Ask a smart question about the company or position" } }
     ]
 };
 
@@ -185,10 +193,13 @@ function saveData() { localStorage.setItem('hr_pwa_data', JSON.stringify(appData
 function saveAndRender() { saveData(); renderQuestions(); }
 
 function applyTheme(theme) {
-    html.setAttribute('data-bs-theme', theme);
+    document.documentElement.setAttribute('data-bs-theme', theme);
     localStorage.setItem('theme', theme);
-    const icon = themeToggle ? themeToggle.querySelector('i') : null;
-    if (icon) icon.className = theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+
+    const themeIcon = document.querySelector('#themeToggle i');
+    if (themeIcon) {
+        themeIcon.className = theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+    }
 }
 
 function sanitizeData(data) {
@@ -233,10 +244,10 @@ window.deleteQuestion = function (id) {
 window.onload = () => {
     const qModalEl = document.getElementById('questionModal');
     const jModalEl = document.getElementById('jobModal');
-    
+
     questionModal = new bootstrap.Modal(qModalEl, { focus: false });
     jobModal = new bootstrap.Modal(jModalEl, { focus: false });
-    
+
     [qModalEl, jModalEl].forEach(el => {
         el.addEventListener('hide.bs.modal', () => {
             el.setAttribute('inert', '');
@@ -309,7 +320,10 @@ window.onload = () => {
         reader.readAsText(file);
     });
 
-    applyTheme(localStorage.getItem('theme') || 'light');
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    applyTheme(currentTheme);
+
     langSwitcher.value = localStorage.getItem('app_lang') || 'uk';
-    updateStaticLabels(); renderQuestions();
+    updateStaticLabels();
+    renderQuestions();
 };
