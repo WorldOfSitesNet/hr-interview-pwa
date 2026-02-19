@@ -193,10 +193,13 @@ function saveData() { localStorage.setItem('hr_pwa_data', JSON.stringify(appData
 function saveAndRender() { saveData(); renderQuestions(); }
 
 function applyTheme(theme) {
-    html.setAttribute('data-bs-theme', theme);
+    document.documentElement.setAttribute('data-bs-theme', theme);
     localStorage.setItem('theme', theme);
-    const icon = themeToggle ? themeToggle.querySelector('i') : null;
-    if (icon) icon.className = theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+
+    const themeIcon = document.querySelector('#themeToggle i');
+    if (themeIcon) {
+        themeIcon.className = theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+    }
 }
 
 function sanitizeData(data) {
@@ -241,10 +244,10 @@ window.deleteQuestion = function (id) {
 window.onload = () => {
     const qModalEl = document.getElementById('questionModal');
     const jModalEl = document.getElementById('jobModal');
-    
+
     questionModal = new bootstrap.Modal(qModalEl, { focus: false });
     jobModal = new bootstrap.Modal(jModalEl, { focus: false });
-    
+
     [qModalEl, jModalEl].forEach(el => {
         el.addEventListener('hide.bs.modal', () => {
             el.setAttribute('inert', '');
@@ -317,7 +320,10 @@ window.onload = () => {
         reader.readAsText(file);
     });
 
-    applyTheme(localStorage.getItem('theme') || 'light');
+    const currentTheme = localStorage.getItem('theme') || 'light';
+    applyTheme(currentTheme);
+
     langSwitcher.value = localStorage.getItem('app_lang') || 'uk';
-    updateStaticLabels(); renderQuestions();
+    updateStaticLabels();
+    renderQuestions();
 };
