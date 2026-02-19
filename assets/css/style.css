@@ -14,3 +14,25 @@ main {
   font-size: 0.7rem;
   vertical-align: middle;
 }
+.no-caret::after {
+    display: none !important;
+}
+.dropdown-item {
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+}
+.dropdown-item i {
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+.overflow-x-auto {
+    scrollbar-width: none;
+}
+.overflow-x-auto::-webkit-scrollbar {
+    display: none;
+}
+.nav-link.active {
+    font-weight: 600;
+}

@@ -16,17 +16,53 @@
     <link rel="manifest" href="manifest.json" />
   </head>
   <body class="bg-body-tertiary">
-    <nav class="navbar navbar-expand-lg bg-body shadow-sm sticky-top border-bottom">
+    <nav class="navbar navbar-expand bg-body shadow-sm sticky-top border-bottom">
       <div class="container">
-        <span class="navbar-brand fw-bold text-primary"> <i class="bi bi-person-badge-fill me-2"></i>HR Cheat Sheet </span>
+        <a class="navbar-brand fw-bold text-primary" href="#">
+          <i class="bi bi-person-badge-fill me-1"></i>
+          <span class="d-none d-sm-inline">HR Cheat Sheet</span>
+          <span class="d-inline d-sm-none">HRCS</span>
+        </a>
+
         <div class="d-flex align-items-center gap-2">
-          <select id="langSwitcher" class="form-select form-select-sm w-auto">
+          <select id="langSwitcher" class="form-select form-select-sm w-auto border-secondary-subtle">
             <option value="uk">UA</option>
             <option value="en">EN</option>
           </select>
-          <button id="themeToggle" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-moon-stars"></i>
-          </button>
+
+          <div class="dropdown">
+            <button class="btn btn-sm btn-outline-secondary dropdown-toggle no-caret" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="bi bi-gear-fill"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+              <li>
+                <button id="themeToggleMobile" class="dropdown-item d-flex align-items-center justify-content-between">
+                  <span data-t="themeToggleLabel">Змінити тему</span>
+                  <i class="bi bi-moon-stars ms-2"></i>
+                </button>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center justify-content-between" data-bs-toggle="modal" data-bs-target="#infoModal">
+                  <span data-t="infoModalTitle">Інформація</span>
+                  <i class="bi bi-info-circle ms-2"></i>
+                </button>
+              </li>
+              <li><hr class="dropdown-divider" /></li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center justify-content-between" id="exportBtn" data-t="btnExport">
+                  <span>Експорт</span>
+                  <i class="bi bi-download text-success"></i>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center justify-content-between" id="importBtn" data-t="btnImport">
+                  <span>Імпорт</span>
+                  <i class="bi bi-upload text-warning"></i>
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </nav>
@@ -42,10 +78,10 @@
               </div>
             </div>
             <div class="col-12 col-md-6 col-lg-5 d-flex gap-2">
-              <button id="addQuestionBtn" class="btn btn-primary flex-grow-1 shadow-sm">
+              <button id="addQuestionBtn" class="btn btn-primary flex-grow-1 shadow-sm" data-t="btnAddQuestion">
                 <i class="bi bi-plus-lg me-1"></i>
               </button>
-              <button id="btnManageJobs" class="btn btn-outline-secondary flex-grow-1 shadow-sm">
+              <button id="btnManageJobs" class="btn btn-outline-secondary flex-grow-1 shadow-sm" data-t="btnManageJobs">
                 <i class="bi bi-tags me-1"></i>
               </button>
             </div>
@@ -54,19 +90,6 @@
       </div>
 
       <div id="questionsList" class="accordion shadow-sm rounded-3 overflow-hidden"></div>
-
-      <div class="mt-5 mb-4 py-4 border-top text-center">
-        <div class="d-inline-flex gap-2 p-2 bg-body rounded shadow-sm border">
-          <button id="exportBtn" class="btn btn-sm btn-outline-success border-0">
-            <i class="bi bi-download me-1"></i>
-          </button>
-          <div class="vr"></div>
-          <button id="importBtn" class="btn btn-sm btn-outline-warning border-0">
-            <i class="bi bi-upload me-1"></i>
-          </button>
-        </div>
-        <input type="file" id="importFile" hidden accept=".json" />
-      </div>
     </main>
 
     <footer class="bg-body border-top py-4 mt-auto">
@@ -102,23 +125,23 @@
               <input type="hidden" id="editId" />
               <div class="row g-4">
                 <div class="col-md-6">
-                  <label class="form-label fw-bold border-bottom pb-1 w-100">Українська версія</label>
-                  <input type="text" id="q_uk" class="form-control mb-3" placeholder="Питання" required />
-                  <textarea id="a_uk" class="form-control mb-3" placeholder="Приклад відповіді" rows="4" required></textarea>
-                  <textarea id="hint_uk" class="form-control" placeholder="Порада (що хоче HR)" rows="2"></textarea>
+                  <label class="form-label fw-bold border-bottom pb-1 w-100" data-t="labelUkVersion">Українська версія</label>
+                  <input type="text" id="q_uk" class="form-control mb-3" data-t-placeholder="phQuestion" required />
+                  <textarea id="a_uk" class="form-control mb-3" data-t-placeholder="phAnswer" rows="4" required></textarea>
+                  <textarea id="hint_uk" class="form-control" data-t-placeholder="phHint" rows="2"></textarea>
                 </div>
                 <div class="col-md-6 border-start-md">
-                  <label class="form-label fw-bold border-bottom pb-1 w-100">English Version</label>
-                  <input type="text" id="q_en" class="form-control mb-3" placeholder="Question" required />
-                  <textarea id="a_en" class="form-control mb-3" placeholder="Sample Answer" rows="4" required></textarea>
-                  <textarea id="hint_en" class="form-control" placeholder="Hint (What HR wants)" rows="2"></textarea>
+                  <label class="form-label fw-bold border-bottom pb-1 w-100" data-t="labelEnVersion">English Version</label>
+                  <input type="text" id="q_en" class="form-control mb-3" data-t-placeholder="phQuestion" required />
+                  <textarea id="a_en" class="form-control mb-3" data-t-placeholder="phAnswer" rows="4" required></textarea>
+                  <textarea id="hint_en" class="form-control" data-t-placeholder="phHint" rows="2"></textarea>
                 </div>
               </div>
             </form>
           </div>
           <div class="modal-footer bg-light">
-            <button type="button" class="btn btn-link text-secondary text-decoration-none" id="btnCancel" data-bs-dismiss="modal"></button>
-            <button type="submit" form="questionForm" class="btn btn-primary px-4" id="btnSave"></button>
+            <button type="button" class="btn btn-link text-secondary text-decoration-none" id="btnCancel" data-bs-dismiss="modal" data-t="btnCancel"></button>
+            <button type="submit" form="questionForm" class="btn btn-primary px-4" id="btnSave" data-t="btnSave"></button>
           </div>
         </div>
       </div>
@@ -128,18 +151,197 @@
       <div class="modal-dialog modal-md modal-dialog-centered">
         <div class="modal-content shadow">
           <div class="modal-header bg-secondary text-white">
-            <h5 class="modal-title" id="modalJobsTitle">Керування категоріями</h5>
+            <h5 class="modal-title" id="modalJobsTitle" data-t="modalJobsTitle">Керування категоріями</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
           </div>
           <div class="modal-body">
             <div id="jobsListContainer" class="mb-3"></div>
-            <button onclick="addCategory()" class="btn btn-sm btn-outline-primary w-100 py-2 border-dashed">
-              <i class="bi bi-plus-circle me-1"></i> <span id="btnAddCategory">Додати категорію</span>
+            <button onclick="addCategory()" class="btn btn-sm btn-outline-primary w-100 py-2 border-dashed" id="btnAddCategory" data-t="btnAddCategory">
+              <i class="bi bi-plus-circle me-1"></i>
             </button>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content shadow border-0">
+          <div class="modal-header border-bottom">
+            <h5 class="modal-title fw-bold text-primary"><i class="bi bi-info-circle-fill me-2"></i><span data-t="infoModalTitle">Інформація</span></h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body p-0">
+            <div class="sticky-top bg-body border-bottom overflow-x-auto overflow-y-hidden pt-2 px-3" style="white-space: nowrap;">
+              <nav class="nav nav-tabs border-bottom-0 flex-nowrap" id="nav-tab" role="tablist">
+                <button
+                  class="nav-link active px-4"
+                  id="nav-about-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#nav-about"
+                  type="button"
+                  role="tab"
+                  data-t="tabAbout"
+                ></button>
+                <button
+                  class="nav-link px-4"
+                  id="nav-help-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#nav-help"
+                  type="button"
+                  role="tab"
+                  data-t="tabFAQ"
+                ></button>
+                <button
+                  class="nav-link px-4"
+                  id="nav-install-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#nav-install"
+                  type="button"
+                  role="tab"
+                  data-t="tabInstall"
+                ></button>
+                <button
+                  class="nav-link px-4"
+                  id="nav-support-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#nav-support"
+                  type="button"
+                  role="tab"
+                  data-t="tabSupport"
+                ></button>
+              </nav>
+            </div>
+
+            <div class="tab-content p-4" id="nav-tabContent">
+              <div class="tab-pane fade show active" id="nav-about" role="tabpanel">
+                <section class="mb-4">
+                  <h6 class="fw-bold"><i class="bi bi-rocket-takeoff me-2"></i><span data-t="aboutWhatTitle">Що це за проєкт?</span></h6>
+                  <p class="text-secondary small" data-t="aboutWhatText"></p>
+                </section>
+                <section class="mb-4">
+                  <h6 class="fw-bold"><i class="bi bi-people me-2"></i><span data-t="aboutWhoTitle">Для кого?</span></h6>
+                  <p class="text-secondary small" data-t="aboutWhoText"></p>
+                </section>
+                <section>
+                  <h6 class="fw-bold"><i class="bi bi-shield-lock me-2"></i><span data-t="aboutPrivacyTitle">Приватність</span></h6>
+                  <p class="text-secondary small" data-t="aboutPrivacyText"></p>
+                </section>
+              </div>
+
+              <div class="tab-pane fade" id="nav-help" role="tabpanel">
+                <div class="accordion accordion-flush" id="faqAccordion">
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button
+                        class="accordion-button collapsed fw-medium"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq1"
+                        data-t="faqQ1"
+                      ></button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                      <div class="accordion-body small text-secondary" data-t="faqA1"></div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button
+                        class="accordion-button collapsed fw-medium"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq2"
+                        data-t="faqQ2"
+                      ></button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                      <div class="accordion-body small text-secondary" data-t="faqA2"></div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button
+                        class="accordion-button collapsed fw-medium"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq3"
+                        data-t="faqQ3"
+                      ></button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                      <div class="accordion-body small text-secondary" data-t="faqA3"></div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button
+                        class="accordion-button collapsed fw-medium"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq4"
+                        data-t="faqQ4"
+                      ></button>
+                    </h2>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                      <div class="accordion-body small text-secondary" data-t="faqA4"></div>
+                    </div>
+                  </div>
+                  <div class="accordion-item">
+                    <h2 class="accordion-header">
+                      <button
+                        class="accordion-button collapsed fw-medium"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#faq5"
+                        data-t="faqQ5"
+                      ></button>
+                    </h2>
+                    <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                      <div class="accordion-body small text-secondary" data-t="faqA5"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="nav-install" role="tabpanel">
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <h6 class="fw-bold"><i class="bi bi-apple me-2"></i>iOS (Safari)</h6>
+                    <p class="small text-secondary" data-t="installIos"></p>
+                  </div>
+                  <div class="col-md-6">
+                    <h6 class="fw-bold"><i class="bi bi-google me-2"></i>Android (Chrome)</h6>
+                    <p class="small text-secondary" data-t="installAndroid"></p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="tab-pane fade text-center py-3" id="nav-support" role="tabpanel">
+                <p class="mb-4" data-t="supportText"></p>
+
+                <div class="card border-0 mb-4 text-start shadow-sm">
+                  <div class="card-body">
+                    <h6 class="fw-bold text-primary"><i class="bi bi-code-slash me-2"></i><span data-t="supportInviteTitle"></span></h6>
+                    <p class="small text-secondary mb-0" data-t="supportInviteText"></p>
+                  </div>
+                </div>
+
+                <p class="small mb-4 text-secondary" data-t="supportCoffee"></p>
+
+                <div class="d-flex flex-column flex-sm-row justify-content-center gap-3">
+                  <a href="https://github.com/WorldOfSitesNet/hr-interview-pwa" target="_blank" class="btn btn-dark btn-lg px-4">
+                    <i class="bi bi-github me-2"></i>GitHub
+                  </a>
+                  <a href="https://www.buymeacoffee.com/buinoff"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=buinoff&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff" /></a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="assets/vendors/bootstrap/bootstrap.bundle.min.js" defer></script>
     <script src="assets/js/script.js" defer></script>
     <script src="assets/js/translations.js"></script>

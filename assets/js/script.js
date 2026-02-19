@@ -1,5 +1,5 @@
 const APP_CONFIG = {
-    version: "1.1.0",
+    version: "1.3.0",
     siteUrl: "https://worldofsites.net",
     repoUrl: "https://github.com/WorldOfSitesNet/hr-interview-pwa"
 };
@@ -21,10 +21,10 @@ const initialData = {
 };
 
 let appData = JSON.parse(localStorage.getItem('hr_pwa_data')) || initialData;
-let questionModal, jobModal;
+let questionModal, jobModal, infoModal;
+let draggedItemIndex = null;
 
 const html = document.documentElement;
-const themeToggle = document.getElementById('themeToggle');
 const langSwitcher = document.getElementById('langSwitcher');
 const questionForm = document.getElementById('questionForm');
 const jobSelect = document.getElementById('jobSelect');
@@ -40,24 +40,28 @@ function t(key) {
 
 function updateStaticLabels() {
     const lang = langSwitcher ? langSwitcher.value : 'uk';
-    document.querySelectorAll('.app-version-display').forEach(el => el.innerText = `v${APP_CONFIG.version}`);
 
-    if (document.getElementById('modalJobsTitle')) document.getElementById('modalJobsTitle').innerText = t('modalJobsTitle');
-    if (document.getElementById('btnAddCategory')) document.getElementById('btnAddCategory').innerText = t('btnAddCategory');
-    if (document.getElementById('btnSave')) document.getElementById('btnSave').innerText = t('btnSave');
-    if (document.getElementById('btnCancel')) document.getElementById('btnCancel').innerText = t('btnCancel');
+    document.querySelectorAll('.app-version-display').forEach(el => {
+        el.innerText = `v${APP_CONFIG.version}`;
+    });
 
-    const manageJobsBtn = document.getElementById('btnManageJobs');
-    if (manageJobsBtn) manageJobsBtn.innerHTML = `<i class="bi bi-tags me-1"></i> ${t('btnManageJobs')}`;
+    document.querySelectorAll('[data-t]').forEach(el => {
+        const key = el.getAttribute('data-t');
+        const translation = t(key);
+        const icon = el.querySelector('i');
 
-    const addBtn = document.getElementById('addQuestionBtn');
-    if (addBtn) addBtn.innerHTML = `<i class="bi bi-plus-lg me-1"></i> ${t('btnAddQuestion')}`;
+        if (icon) {
+            const iconHtml = icon.outerHTML;
+            el.innerHTML = `${iconHtml} <span>${translation}</span>`;
+        } else {
+            el.innerHTML = translation;
+        }
+    });
 
-    const expBtn = document.getElementById('exportBtn');
-    if (expBtn) expBtn.innerHTML = `<i class="bi bi-download me-1"></i> ${t('btnExport')}`;
-
-    const impBtn = document.getElementById('importBtn');
-    if (impBtn) impBtn.innerHTML = `<i class="bi bi-upload me-1"></i> ${t('btnImport')}`;
+    document.querySelectorAll('[data-t-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-t-placeholder');
+        el.placeholder = t(key);
+    });
 
     renderJobSelect();
 }
@@ -77,7 +81,6 @@ function renderJobSelect() {
 function renderJobsList() {
     const container = document.getElementById('jobsListContainer');
     if (!container) return;
-    const lang = langSwitcher.value;
     container.innerHTML = appData.jobs.map(job => `
         <div class="card mb-2 shadow-sm border-0 bg-light text-dark">
             <div class="card-body p-2">
@@ -111,14 +114,13 @@ window.deleteJob = function (id) {
     if (confirm(t('confirmDelete'))) {
         appData.questions.forEach(q => { if (q.jobId === id) q.jobId = 'default'; });
         appData.jobs = appData.jobs.filter(j => j.id !== id);
-        saveData(); renderJobsList(); renderJobSelect(); renderQuestions();
-        if (jobSelect.value === id) { jobSelect.value = 'default'; renderQuestions(); }
+        saveAndRender();
+        renderJobsList();
+        renderJobSelect();
     }
 };
 
-// --- DRAG AND DROP ---
-let draggedItemIndex = null;
-
+// --- DRAG AND DROP LOGIC ---
 function addDragEvents(element) {
     element.addEventListener('dragstart', (e) => {
         draggedItemIndex = parseInt(e.currentTarget.dataset.fullIndex);
@@ -143,6 +145,7 @@ function addDragEvents(element) {
     });
 }
 
+// --- RENDER QUESTIONS ---
 function renderQuestions() {
     const list = document.getElementById('questionsList');
     if (!list) return;
@@ -184,42 +187,47 @@ function renderQuestions() {
     });
 
     if (list.innerHTML === '') {
-        list.innerHTML = `<div class="text-center p-5 text-secondary opacity-50"><i class="bi bi-inbox fs-1"></i><p class="mt-2">${lang === 'uk' ? 'Питань поки немає' : 'No questions yet'}</p></div>`;
+        const emptyMsg = lang === 'uk' ? 'Питань поки немає' : 'No questions yet';
+        list.innerHTML = `<div class="text-center p-5 text-secondary opacity-50"><i class="bi bi-inbox fs-1"></i><p class="mt-2">${emptyMsg}</p></div>`;
     }
 }
 
-// --- SERVICE FUNCTIONS ---
+// --- CORE FUNCTIONS ---
 function saveData() { localStorage.setItem('hr_pwa_data', JSON.stringify(appData)); }
 function saveAndRender() { saveData(); renderQuestions(); }
 
 function applyTheme(theme) {
     document.documentElement.setAttribute('data-bs-theme', theme);
     localStorage.setItem('theme', theme);
-
-    const themeIcon = document.querySelector('#themeToggle i');
-    if (themeIcon) {
-        themeIcon.className = theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
-    }
+    const icons = document.querySelectorAll('#themeToggle i, #themeToggleMobile i');
+    icons.forEach(icon => {
+        icon.className = theme === 'dark' ? 'bi bi-sun-fill' : 'bi bi-moon-stars-fill';
+    });
 }
 
-function sanitizeData(data) {
-    if (!data.jobs) data.jobs = initialData.jobs;
-    data.questions = (data.questions || []).map(q => ({
-        id: q.id || Date.now() + Math.random(),
-        jobId: q.jobId || 'default',
-        q: { uk: q.q.uk || "", en: q.q.en || "" },
-        a: { uk: q.a.uk || "", en: q.a.en || "" },
-        hint: { uk: q.hint.uk || "", en: q.hint.en || "" }
-    }));
-    return data;
+function handleExport() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+    const link = document.createElement('a');
+    link.href = dataStr;
+    link.download = `hr_cheat_sheet_v${APP_CONFIG.version}.json`;
+    link.click();
 }
 
-// --- MODAL UTILS (FIX ARIA ERRORS) ---
-function safeModalHide(modalObj, modalEl) {
-    if (modalEl.contains(document.activeElement)) {
-        document.activeElement.blur();
-    }
-    modalObj.hide();
+function handleImport(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        try {
+            const importedData = JSON.parse(event.target.result);
+            if (confirm(t('confirmImport'))) {
+                appData = importedData;
+                saveAndRender();
+                location.reload();
+            }
+        } catch (err) { alert(t('importError')); }
+    };
+    reader.readAsText(file);
 }
 
 // --- ACTIONS ---
@@ -242,30 +250,46 @@ window.deleteQuestion = function (id) {
 
 // --- INITIALIZATION ---
 window.onload = () => {
+    // Инициализация модалок
     const qModalEl = document.getElementById('questionModal');
     const jModalEl = document.getElementById('jobModal');
+    const iModalEl = document.getElementById('infoModal');
 
     questionModal = new bootstrap.Modal(qModalEl, { focus: false });
     jobModal = new bootstrap.Modal(jModalEl, { focus: false });
+    infoModal = new bootstrap.Modal(iModalEl, { focus: false });
 
-    [qModalEl, jModalEl].forEach(el => {
-        el.addEventListener('hide.bs.modal', () => {
-            el.setAttribute('inert', '');
+    // FIX ARIA-HIDDEN / FOCUS ERROR
+    [qModalEl, jModalEl, iModalEl].forEach(modalEl => {
+        // Перед тем как модалка начнет закрываться - убираем фокус
+        modalEl.addEventListener('hide.bs.modal', () => {
+            if (document.activeElement && modalEl.contains(document.activeElement)) {
+                document.activeElement.blur();
+            }
         });
-        el.addEventListener('hidden.bs.modal', () => {
-            if (document.activeElement) document.activeElement.blur();
+        // После закрытия - добавляем inert для безопасности
+        modalEl.addEventListener('hidden.bs.modal', () => {
+            modalEl.setAttribute('inert', '');
         });
-        el.addEventListener('show.bs.modal', () => {
-            el.removeAttribute('inert');
+        // При открытии - удаляем inert
+        modalEl.addEventListener('show.bs.modal', () => {
+            modalEl.removeAttribute('inert');
         });
     });
 
     langSwitcher.addEventListener('change', () => {
         localStorage.setItem('app_lang', langSwitcher.value);
-        updateStaticLabels(); renderQuestions();
+        updateStaticLabels();
+        renderQuestions();
     });
 
-    themeToggle.addEventListener('click', () => applyTheme(html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark'));
+    document.querySelectorAll('#themeToggle, #themeToggleMobile').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const newTheme = html.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            applyTheme(newTheme);
+        });
+    });
+
     jobSelect.addEventListener('change', () => renderQuestions());
 
     questionForm.addEventListener('submit', (e) => {
@@ -285,11 +309,10 @@ window.onload = () => {
             appData.questions.push(newQuestion);
         }
         saveAndRender();
-        safeModalHide(questionModal, qModalEl);
+        questionModal.hide();
     });
 
     document.getElementById('btnManageJobs').addEventListener('click', () => { renderJobsList(); jobModal.show(); });
-
     document.getElementById('addQuestionBtn').addEventListener('click', () => {
         questionForm.reset();
         document.getElementById('editId').value = '';
@@ -297,32 +320,16 @@ window.onload = () => {
         questionModal.show();
     });
 
-    document.getElementById('exportBtn').addEventListener('click', () => {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ appData }, null, 2));
-        const link = document.createElement('a');
-        link.href = dataStr;
-        link.download = `hr_cheat_sheet_v${APP_CONFIG.version}.json`;
-        link.click();
-    });
+    document.querySelectorAll('#exportBtn').forEach(btn => btn.addEventListener('click', handleExport));
+    document.querySelectorAll('#importBtn').forEach(btn => btn.addEventListener('click', () => document.getElementById('importFile').click()));
 
-    document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
-    document.getElementById('importFile').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            try {
-                const imported = JSON.parse(ev.target.result);
-                appData = sanitizeData(imported.appData || imported);
-                saveAndRender(); updateStaticLabels(); alert(t('importSuccess'));
-            } catch (err) { alert(t('importReadError') + err.message); }
-        };
-        reader.readAsText(file);
-    });
+    const fileInput = document.getElementById('importFile');
+    if (fileInput) {
+        fileInput.addEventListener('change', handleImport);
+    }
 
     const currentTheme = localStorage.getItem('theme') || 'light';
     applyTheme(currentTheme);
-
     langSwitcher.value = localStorage.getItem('app_lang') || 'uk';
     updateStaticLabels();
     renderQuestions();
